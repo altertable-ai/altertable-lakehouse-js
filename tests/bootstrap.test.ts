@@ -175,10 +175,10 @@ test('debugConfiguration redacts credentials', () => {
       maxDelayMs: 1000,
       retryOnStatuses: [408, 429, 500, 502, 503, 504],
     },
-    userAgent: 'altertable-lakehouse-js/0.1.0',
+    userAgent: 'lakehouse/0.1.0',
     headers: {
       authorization: 'Basic [REDACTED]',
-      'user-agent': 'altertable-lakehouse-js/0.1.0',
+      'user-agent': 'lakehouse/0.1.0',
     },
   });
 });

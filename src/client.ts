@@ -35,7 +35,9 @@ const DEFAULT_RETRY_POLICY: Required<RetryPolicy> = {
   maxDelayMs: 1_000,
   retryOnStatuses: [408, 429, 500, 502, 503, 504],
 };
-const USER_AGENT = 'altertable-lakehouse-js/0.1.0';
+import packageJson from '../package.json' with { type: 'json' };
+
+const USER_AGENT = `${packageJson.name.replace(/^@[^/]+\//, '')}/${packageJson.version}`;
 
 function encodeBasicAuth(username: string, password: string): string {
   return Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
