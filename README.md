@@ -32,7 +32,17 @@ await client.append({
   catalog: 'memory',
   schema: 'main',
   table: 'events',
-  body: { Single: { user_id: 1, action: 'signup' } },
+  body: { user_id: 1, action: 'signup' },
+});
+
+await client.append({
+  catalog: 'memory',
+  schema: 'main',
+  table: 'events',
+  body: [
+    { user_id: 2, action: 'login' },
+    { user_id: 3, action: 'purchase' },
+  ],
 });
 ```
 
