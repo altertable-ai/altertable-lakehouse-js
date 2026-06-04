@@ -79,8 +79,8 @@ await client.upload(
     catalog: 'memory',
     schema: 'main',
     table: 'events',
-    format: 'csv',
     mode: 'create',
+    contentType: 'text/csv',
   },
   'id,name\n1,Alice\n',
 );

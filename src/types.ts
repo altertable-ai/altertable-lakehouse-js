@@ -1,5 +1,4 @@
 export type ComputeSize = 'XS' | 'S' | 'M' | 'L' | 'XL';
-export type UploadFormat = 'csv' | 'json' | 'parquet';
 export type UploadMode = 'create' | 'append' | 'upsert' | 'overwrite';
 export type SessionKind =
   | 'ArrowFlightSQL'
@@ -159,7 +158,7 @@ export interface UploadOptions {
   catalog: string;
   schema: string;
   table: string;
-  format: UploadFormat;
-  mode: UploadMode;
+  mode?: UploadMode;
   primary_key?: string;
+  contentType?: string;
 }

@@ -128,26 +128,31 @@ test('query parse failures include line context', async () => {
   });
 });
 
-test('upload requires primary_key for upsert mode', async () => {
+test('upload posts to upsert endpoint without format query parameter', async () => {
+  let requestedUrl: string | undefined;
+  let requestedContentType: string | null = null;
   const client = new AltertableLakehouseClient({
     basicAuthToken: 'token',
-    fetch: globalThis.fetch,
+    fetch: async (input, init) => {
+      requestedUrl = String(input);
+      requestedContentType = new Headers(init?.headers).get('Content-Type');
+      return new Response('', { status: 200 });
+    },
   });
 
-  await assert.rejects(
-    () =>
-      client.upload(
-        {
-          catalog: 'memory',
-          schema: 'main',
-          table: 'items',
-          format: 'json',
-          mode: 'upsert',
-        },
-        '{"id":1}',
-      ),
-    ConfigurationError,
+  await client.upload(
+    {
+      catalog: 'memory',
+      schema: 'main',
+      table: 'items',
+      contentType: 'application/json',
+    },
+    '{"id":1}',
   );
+
+  assert.ok(requestedUrl?.includes('/upsert?'));
+  assert.ok(!requestedUrl?.includes('format='));
+  assert.equal(requestedContentType, 'application/json');
 });
 
 test('401 responses raise AuthError', async () => {
