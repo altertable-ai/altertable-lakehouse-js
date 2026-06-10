@@ -71,16 +71,15 @@ const cancelled = await client.cancelQuery(
 console.log(cancelled);
 ```
 
-### upload
+### upsert
 
 ```ts
-await client.upload(
+await client.upsert(
   {
     catalog: 'memory',
     schema: 'main',
     table: 'events',
     mode: 'create',
-    contentType: 'text/csv',
   },
   'id,name\n1,Alice\n',
 );

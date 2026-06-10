@@ -128,7 +128,7 @@ test('query parse failures include line context', async () => {
   });
 });
 
-test('upload posts to upsert endpoint without format query parameter', async () => {
+test('upsert posts to upsert endpoint without format query parameter or content type', async () => {
   let requestedUrl: string | undefined;
   let requestedContentType: string | null = null;
   const client = new AltertableLakehouseClient({
@@ -140,19 +140,18 @@ test('upload posts to upsert endpoint without format query parameter', async () 
     },
   });
 
-  await client.upload(
+  await client.upsert(
     {
       catalog: 'memory',
       schema: 'main',
       table: 'items',
-      contentType: 'application/json',
     },
     '{"id":1}',
   );
 
   assert.ok(requestedUrl?.includes('/upsert?'));
   assert.ok(!requestedUrl?.includes('format='));
-  assert.equal(requestedContentType, 'application/json');
+  assert.equal(requestedContentType, null);
 });
 
 test('401 responses raise AuthError', async () => {

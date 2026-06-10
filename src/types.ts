@@ -1,5 +1,5 @@
 export type ComputeSize = 'XS' | 'S' | 'M' | 'L' | 'XL';
-export type UploadMode = 'create' | 'append' | 'upsert' | 'overwrite';
+export type UpsertMode = 'create' | 'append' | 'upsert' | 'overwrite';
 export type SessionKind =
   | 'ArrowFlightSQL'
   | 'HttpQuery'
@@ -154,11 +154,10 @@ export interface ClientOptions {
   fetch?: typeof globalThis.fetch;
 }
 
-export interface UploadOptions {
+export interface UpsertOptions {
   catalog: string;
   schema: string;
   table: string;
-  mode?: UploadMode;
+  mode?: UpsertMode;
   primary_key?: string;
-  contentType?: string;
 }

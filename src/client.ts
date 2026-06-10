@@ -20,7 +20,7 @@ import type {
   QueryRow,
   QueryStreamResult,
   RetryPolicy,
-  UploadOptions,
+  UpsertOptions,
   ValidateRequest,
   ValidateResponse,
   CancelQueryResponse,
@@ -195,7 +195,7 @@ export class AltertableLakehouseClient {
     };
   }
 
-  async upload(options: UploadOptions, body: ArrayBuffer | ArrayBufferView | Blob | string): Promise<void> {
+  async upsert(options: UpsertOptions, body: ArrayBuffer | ArrayBufferView | Blob | string): Promise<void> {
     await this.request({
       operation: 'upsert',
       method: 'POST',
@@ -206,9 +206,6 @@ export class AltertableLakehouseClient {
         table: options.table,
         mode: options.mode,
         primary_key: options.primary_key,
-      },
-      headers: {
-        'Content-Type': options.contentType ?? 'application/octet-stream',
       },
       rawBody: body,
     });
