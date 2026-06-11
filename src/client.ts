@@ -20,7 +20,7 @@ import type {
   QueryRow,
   QueryStreamResult,
   RetryPolicy,
-  UploadOptions,
+  UpsertOptions,
   ValidateRequest,
   ValidateResponse,
   CancelQueryResponse,
@@ -195,29 +195,17 @@ export class AltertableLakehouseClient {
     };
   }
 
-  async upload(options: UploadOptions, body: ArrayBuffer | ArrayBufferView | Blob | string): Promise<void> {
-    if (options.mode === 'upsert' && !options.primary_key) {
-      throw new ConfigurationError('primary_key is required when mode=upsert', {
-        operation: 'upload',
-        method: 'POST',
-        path: '/upload',
-      });
-    }
-
+  async upsert(options: UpsertOptions, body: ArrayBuffer | ArrayBufferView | Blob | string): Promise<void> {
     await this.request({
-      operation: 'upload',
+      operation: 'upsert',
       method: 'POST',
-      path: '/upload',
+      path: '/upsert',
       query: {
         catalog: options.catalog,
         schema: options.schema,
         table: options.table,
-        format: options.format,
         mode: options.mode,
         primary_key: options.primary_key,
-      },
-      headers: {
-        'Content-Type': 'application/octet-stream',
       },
       rawBody: body,
     });
