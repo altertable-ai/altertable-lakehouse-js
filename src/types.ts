@@ -10,7 +10,7 @@ export type SessionKind =
   | 'Postgres';
 
 export type AppendPayload = Record<string, unknown>;
-export type AppendRequest = { Single: AppendPayload } | { Batch: AppendPayload[] };
+export type AppendRequest = AppendPayload | AppendPayload[];
 
 export interface AppendResponse {
   ok: boolean;

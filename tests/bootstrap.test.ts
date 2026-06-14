@@ -128,6 +128,58 @@ test('query parse failures include line context', async () => {
   });
 });
 
+test('append sends a single row as a raw JSON object', async () => {
+  let body = '';
+  const client = new AltertableLakehouseClient({
+    basicAuthToken: 'token',
+    fetch: async (_input, init) => {
+      body = String(init?.body);
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    },
+  });
+
+  await client.append({
+    catalog: 'memory',
+    schema: 'main',
+    table: 'events',
+    body: { user_id: 1, action: 'signup' },
+  });
+
+  assert.deepEqual(JSON.parse(body), { user_id: 1, action: 'signup' });
+});
+
+test('append sends multiple rows as a raw JSON array', async () => {
+  let body = '';
+  const client = new AltertableLakehouseClient({
+    basicAuthToken: 'token',
+    fetch: async (_input, init) => {
+      body = String(init?.body);
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    },
+  });
+
+  await client.append({
+    catalog: 'memory',
+    schema: 'main',
+    table: 'events',
+    body: [
+      { user_id: 2, action: 'login' },
+      { user_id: 3, action: 'purchase' },
+    ],
+  });
+
+  assert.deepEqual(JSON.parse(body), [
+    { user_id: 2, action: 'login' },
+    { user_id: 3, action: 'purchase' },
+  ]);
+});
+
 test('upsert posts to upsert endpoint without format query parameter or content type', async () => {
   let requestedUrl: string | undefined;
   let requestedContentType: string | null = null;
