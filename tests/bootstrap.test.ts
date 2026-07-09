@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import packageJson from '../package.json' with { type: 'json' };
 import {
   AltertableLakehouseClient,
   AuthError,
@@ -216,6 +217,7 @@ test('401 responses raise AuthError', async () => {
 });
 
 test('debugConfiguration redacts credentials', () => {
+  const expectedUserAgent = `altertable-lakehouse-js/${packageJson.version}`;
   const client = new AltertableLakehouseClient({
     basicAuthToken: 'super-secret',
     fetch: globalThis.fetch,
@@ -231,10 +233,10 @@ test('debugConfiguration redacts credentials', () => {
       maxDelayMs: 1000,
       retryOnStatuses: [408, 429, 500, 502, 503, 504],
     },
-    userAgent: 'altertable-lakehouse-js/0.2.0',
+    userAgent: expectedUserAgent,
     headers: {
       authorization: 'Basic [REDACTED]',
-      'user-agent': 'altertable-lakehouse-js/0.2.0',
+      'user-agent': expectedUserAgent,
     },
   });
 });
