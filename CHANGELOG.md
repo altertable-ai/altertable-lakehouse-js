@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.2.1...lakehouse-v0.2.2) (2026-07-27)
+
+
+### Bug Fixes
+
+* render bug report runtime label ([#15](https://github.com/altertable-ai/altertable-lakehouse-js/issues/15)) ([4295a2e](https://github.com/altertable-ai/altertable-lakehouse-js/commit/4295a2ea382c87ccfe3cc9a7c1f1863dbef44560))
+
 ## [0.2.1](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.2.0...lakehouse-v0.2.1) (2026-06-30)
 
 
