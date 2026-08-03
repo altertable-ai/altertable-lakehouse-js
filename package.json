@@ -3,6 +3,10 @@
   "version": "0.2.1",
   "description": "Altertable Lakehouse JS/TS API client",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/altertable-ai/altertable-lakehouse-js"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
