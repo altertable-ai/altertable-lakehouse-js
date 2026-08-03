@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.2](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.2.1...lakehouse-v0.2.2) (2026-08-03)
+
+
+### Bug Fixes
+
+* **ci:** use npm runtime with trusted publishing support ([#17](https://github.com/altertable-ai/altertable-lakehouse-js/issues/17)) ([20b99d8](https://github.com/altertable-ai/altertable-lakehouse-js/commit/20b99d84da798ee83fdbd716eb3046be8e25dc64))
+* **package:** add repository metadata for provenance ([#19](https://github.com/altertable-ai/altertable-lakehouse-js/issues/19)) ([6f0a06a](https://github.com/altertable-ai/altertable-lakehouse-js/commit/6f0a06a23af55917e7cc6ad3284dbe1c0a984539))
+* render bug report runtime label ([#15](https://github.com/altertable-ai/altertable-lakehouse-js/issues/15)) ([4295a2e](https://github.com/altertable-ai/altertable-lakehouse-js/commit/4295a2ea382c87ccfe3cc9a7c1f1863dbef44560))
+
 ## [0.2.1](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.2.0...lakehouse-v0.2.1) (2026-06-30)
 
 
