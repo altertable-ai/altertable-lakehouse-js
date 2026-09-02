@@ -8,6 +8,7 @@ import {
   ConfigurationError,
   ParseError,
 } from '../src/index.js';
+import type { UpsertOptions } from '../src/index.js';
 
 const encoder = new TextEncoder();
 
@@ -181,7 +182,7 @@ test('append sends multiple rows as a raw JSON array', async () => {
   ]);
 });
 
-test('upsert posts to upsert endpoint without format query parameter or content type', async () => {
+test('upsert sends primary_key and ignores unsupported mode query parameters', async () => {
   let requestedUrl: string | undefined;
   let requestedContentType: string | null = null;
   const client = new AltertableLakehouseClient({
@@ -193,17 +194,19 @@ test('upsert posts to upsert endpoint without format query parameter or content 
     },
   });
 
-  await client.upsert(
-    {
-      catalog: 'memory',
-      schema: 'main',
-      table: 'items',
-    },
-    '{"id":1}',
-  );
+  await client.upsert({
+    catalog: 'memory',
+    schema: 'main',
+    table: 'items',
+    primary_key: 'id',
+    // Assert runtime input cannot reintroduce the removed query parameter.
+    mode: 'create',
+  } as unknown as UpsertOptions, '{"id":1}');
 
   assert.ok(requestedUrl?.includes('/upsert?'));
   assert.ok(!requestedUrl?.includes('format='));
+  assert.ok(requestedUrl?.includes('primary_key=id'));
+  assert.ok(!requestedUrl?.includes('mode='));
   assert.equal(requestedContentType, null);
 });
 

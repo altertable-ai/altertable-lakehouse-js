@@ -204,7 +204,6 @@ export class AltertableLakehouseClient {
         catalog: options.catalog,
         schema: options.schema,
         table: options.table,
-        mode: options.mode,
         primary_key: options.primary_key,
       },
       rawBody: body,
