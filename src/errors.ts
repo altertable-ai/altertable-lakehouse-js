@@ -49,6 +49,15 @@ export class ParseError extends AltertableLakehouseError {
   }
 }
 
+export class QueryError extends ParseError {
+  readonly queryError: string;
+
+  constructor(message: string, lineIndex: number, rawLine: string, options: AltertableErrorOptions = {}) {
+    super(`Query stream error: ${message}`, lineIndex, rawLine, options);
+    this.queryError = message;
+  }
+}
+
 export class ApiError extends AltertableLakehouseError {
   readonly responseBody: string | undefined;
 
