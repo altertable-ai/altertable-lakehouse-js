@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+* **api:** align query streaming, upload, upsert, and compute-size contracts with client specs v0.13.0
+
 ## [0.2.2](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.2.1...lakehouse-v0.2.2) (2026-08-03)
 
 

@@ -5,6 +5,7 @@ import {
   ConfigurationError,
   NetworkError,
   ParseError,
+  QueryError,
   SerializationError,
   TimeoutError,
 } from './errors.js';
@@ -21,6 +22,7 @@ import type {
   QueryStreamResult,
   RetryPolicy,
   UpsertOptions,
+  UploadOptions,
   ValidateRequest,
   ValidateResponse,
   CancelQueryResponse,
@@ -127,6 +129,13 @@ export class AltertableLakehouseClient {
   }
 
   async query(request: QueryRequest): Promise<QueryStreamResult> {
+    if (request.compute_size === 'AUTO' && request.session_id) {
+      throw new ConfigurationError('compute_size AUTO cannot be combined with session_id', {
+        operation: 'query',
+        method: 'POST',
+        path: '/query',
+      });
+    }
     const response = await this.request({
       operation: 'query',
       method: 'POST',
@@ -151,7 +160,7 @@ export class AltertableLakehouseClient {
     const metadataLine = await this.readNextLine(streamReader, decoder, 'query');
     const columnsLine = await this.readNextLine(streamReader, decoder, 'query');
     const metadata = this.parseMetadataLine(metadataLine);
-    const columns = this.parseColumnsLine(columnsLine);
+    const columns = this.parseColumnsLine(columnsLine, 1);
 
     const self = this;
     async function* rows(): AsyncIterable<QueryRow> {
@@ -204,8 +213,23 @@ export class AltertableLakehouseClient {
         catalog: options.catalog,
         schema: options.schema,
         table: options.table,
-        mode: options.mode,
         primary_key: options.primary_key,
+        cursor_field: options.cursor_field,
+      },
+      rawBody: body,
+    });
+  }
+
+  async upload(options: UploadOptions, body: ArrayBuffer | ArrayBufferView | Blob | string): Promise<void> {
+    await this.request({
+      operation: 'upload',
+      method: 'POST',
+      path: '/upload',
+      query: {
+        catalog: options.catalog,
+        schema: options.schema,
+        table: options.table,
+        mode: options.mode,
       },
       rawBody: body,
     });
@@ -420,14 +444,18 @@ export class AltertableLakehouseClient {
     }
   }
 
-  private parseColumnsLine(line: string): QueryColumn[] {
+  private parseColumnsLine(line: string, lineIndex: number): QueryColumn[] {
     try {
       const parsed = JSON.parse(line);
-      if (!Array.isArray(parsed) || !parsed.every((item) => typeof item === 'string')) {
-        throw new TypeError('columns line must be a string array');
+      if (this.isStreamError(parsed)) {
+        throw this.toQueryError(parsed.error, lineIndex, line);
+      }
+      if (!Array.isArray(parsed) || !parsed.every((item) => this.isQueryColumn(item))) {
+        throw new TypeError('columns line must be an array of { name, type } objects');
       }
       return parsed;
     } catch (cause) {
+      if (cause instanceof QueryError) throw cause;
       throw new ParseError('Failed to parse query columns', 1, line, {
         cause,
         operation: 'query',
@@ -440,6 +468,9 @@ export class AltertableLakehouseClient {
   private parseRowLine(line: string, lineIndex: number, columns: QueryColumn[]): QueryRow {
     try {
       const parsed = JSON.parse(line);
+      if (this.isStreamError(parsed)) {
+        throw this.toQueryError(parsed.error, lineIndex, line);
+      }
       if (!Array.isArray(parsed)) {
         throw new TypeError('row line must be an array');
       }
@@ -447,11 +478,12 @@ export class AltertableLakehouseClient {
       for (let i = 0; i < columns.length; i += 1) {
         const column = columns[i];
         if (column !== undefined) {
-          row[column] = parsed[i];
+          row[column.name] = parsed[i];
         }
       }
       return row;
     } catch (cause) {
+      if (cause instanceof QueryError) throw cause;
       throw new ParseError('Failed to parse query row', lineIndex, line, {
         cause,
         operation: 'query',
@@ -459,6 +491,24 @@ export class AltertableLakehouseClient {
         path: '/query',
       });
     }
+  }
+
+  private isQueryColumn(value: unknown): value is QueryColumn {
+    return typeof value === 'object' && value !== null
+      && typeof (value as QueryColumn).name === 'string'
+      && typeof (value as QueryColumn).type === 'string';
+  }
+
+  private isStreamError(value: unknown): value is { error: string } {
+    return typeof value === 'object' && value !== null && typeof (value as { error?: unknown }).error === 'string';
+  }
+
+  private toQueryError(message: string, lineIndex: number, rawLine: string): QueryError {
+    return new QueryError(message, lineIndex, rawLine, {
+      operation: 'query',
+      method: 'POST',
+      path: '/query',
+    });
   }
 
   debugConfiguration(): Record<string, unknown> {
