@@ -89,11 +89,27 @@ await client.upsert(
     catalog: 'memory',
     schema: 'main',
     table: 'events',
-    mode: 'create',
+    primary_key: 'account_id,event_id',
+    cursor_field: 'updated_at,sequence',
   },
   'id,name\n1,Alice\n',
 );
 ```
+
+`primary_key` and `cursor_field` accept comma-separated composite columns. With
+`cursor_field`, a matching row is updated only when its cursor is strictly
+higher; composite cursors compare left-to-right and `null` is the lowest value.
+
+### upload
+
+```ts
+await client.upload(
+  { catalog: 'memory', schema: 'main', table: 'events', mode: 'create_append' },
+  'id,name\n1,Alice\n',
+);
+```
+
+`create_append` creates the table when it is missing and otherwise appends.
 
 ### validate
 
