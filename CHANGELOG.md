@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add named and positional query bind values through `QueryRequest.params`.
+
 ## [0.2.2](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.2.1...lakehouse-v0.2.2) (2026-08-03)
 
 
