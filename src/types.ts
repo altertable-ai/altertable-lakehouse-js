@@ -1,5 +1,4 @@
 export type ComputeSize = 'XS' | 'S' | 'M' | 'L' | 'XL';
-export type UpsertMode = 'create' | 'append' | 'upsert' | 'overwrite';
 export type SessionKind =
   | 'ArrowFlightSQL'
   | 'HttpQuery'
@@ -159,6 +158,5 @@ export interface UpsertOptions {
   catalog: string;
   schema: string;
   table: string;
-  mode?: UpsertMode;
-  primary_key?: string;
+  primary_key: string;
 }

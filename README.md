@@ -92,7 +92,7 @@ await client.upsert(
     catalog: 'memory',
     schema: 'main',
     table: 'events',
-    mode: 'create',
+    primary_key: 'id',
   },
   'id,name\n1,Alice\n',
 );
