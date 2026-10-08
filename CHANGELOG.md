@@ -4,6 +4,13 @@
 
 - Add named and positional query bind values through `QueryRequest.params`.
 
+## [0.3.0](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.2.2...lakehouse-v0.3.0) (2026-10-08)
+
+
+### Features
+
+* **query:** support bind parameters ([#24](https://github.com/altertable-ai/altertable-lakehouse-js/issues/24)) ([3a4fb98](https://github.com/altertable-ai/altertable-lakehouse-js/commit/3a4fb98bd265dea62c780fbdfa8536622062fe26))
+
 ## [0.2.2](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.2.1...lakehouse-v0.2.2) (2026-08-03)
 
 
