@@ -49,7 +49,10 @@ await client.append({
 ### query (streamed)
 
 ```ts
-const result = await client.query({ statement: 'SELECT 42 AS answer' });
+const result = await client.query({
+  statement: 'SELECT $min_age AS answer',
+  params: { min_age: 25 },
+});
 console.log(result.metadata);
 console.log(result.columns);
 for await (const row of result.rows) {

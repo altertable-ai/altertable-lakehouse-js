@@ -75,6 +75,25 @@ test('queryAll accumulates metadata, columns, and rows', async () => {
   assert.deepEqual(result.rows, [{ answer: 42 }]);
 });
 
+test('query serializes named and positional bind values', async () => {
+  const bodies: string[] = [];
+  const client = new AltertableLakehouseClient({
+    basicAuthToken: 'token',
+    fetch: async (_input, init) => {
+      bodies.push(String(init?.body));
+      return new Response(makeNdjsonStream([JSON.stringify({}), JSON.stringify([])]), {
+        status: 200, headers: { 'content-type': 'application/x-ndjson' },
+      });
+    },
+  });
+
+  await (await client.query({ statement: 'SELECT $min_age', params: { min_age: 25 } })).rows[Symbol.asyncIterator]().next();
+  await (await client.query({ statement: 'SELECT $1', params: [25] })).rows[Symbol.asyncIterator]().next();
+
+  assert.deepEqual(JSON.parse(bodies[0]!), { statement: 'SELECT $min_age', params: { min_age: 25 } });
+  assert.deepEqual(JSON.parse(bodies[1]!), { statement: 'SELECT $1', params: [25] });
+});
+
 test('query exposes async row iteration', async () => {
   const client = new AltertableLakehouseClient({
     basicAuthToken: 'token',

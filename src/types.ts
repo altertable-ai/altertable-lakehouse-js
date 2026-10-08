@@ -27,6 +27,7 @@ export interface QueryRequest {
   ephemeral?: boolean | null;
   limit?: number | null;
   offset?: number | null;
+  params?: Record<string, string | number | boolean | null> | Array<string | number | boolean | null>;
   query_id?: string | null;
   requested_by?: string | null;
   sanitize?: boolean | null;
