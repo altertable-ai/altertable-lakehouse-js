@@ -1,5 +1,5 @@
-export type ComputeSize = 'XS' | 'S' | 'M' | 'L' | 'XL';
-export type UpsertMode = 'create' | 'append' | 'upsert' | 'overwrite';
+export type ComputeSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | '2XL' | '3XL' | '4XL' | 'AUTO';
+export type UploadMode = 'create' | 'append' | 'create_append' | 'overwrite';
 export type SessionKind =
   | 'ArrowFlightSQL'
   | 'HttpQuery'
@@ -24,7 +24,9 @@ export interface QueryRequest {
   cache?: boolean | null;
   catalog?: string | null;
   compute_size?: ComputeSize | null;
+  dialect?: string | null;
   ephemeral?: boolean | null;
+  format?: 'default' | 'csv' | 'jsonl' | 'parquet' | null;
   limit?: number | null;
   offset?: number | null;
   params?: Record<string, string | number | boolean | null> | Array<string | number | boolean | null>;
@@ -34,7 +36,6 @@ export interface QueryRequest {
   schema?: string | null;
   session_id?: string | null;
   timezone?: string | null;
-  visible?: boolean | null;
 }
 
 export interface ValidateRequest {
@@ -109,7 +110,10 @@ export interface QueryLogResponse extends QueryLog {
   total_rows?: number;
 }
 
-export type QueryColumn = string;
+export interface QueryColumn {
+  name: string;
+  type: string;
+}
 export type QueryRow = Record<string, unknown>;
 
 export interface QueryMetadata {
@@ -159,6 +163,13 @@ export interface UpsertOptions {
   catalog: string;
   schema: string;
   table: string;
-  mode?: UpsertMode;
-  primary_key?: string;
+  primary_key: string;
+  cursor_field?: string;
+}
+
+export interface UploadOptions {
+  catalog: string;
+  schema: string;
+  table: string;
+  mode: UploadMode;
 }

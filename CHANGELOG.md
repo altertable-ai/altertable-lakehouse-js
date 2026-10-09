@@ -4,6 +4,10 @@
 
 - Add named and positional query bind values through `QueryRequest.params`.
 
+### Features
+
+- **api:** align query streaming, upload, upsert, and compute-size contracts with client specs v0.13.0
+
 ## [0.3.0](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.2.2...lakehouse-v0.3.0) (2026-10-08)
 
 
