@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix package entry points to reference the compiled client and declarations.
+
 - Add named and positional query bind values through `QueryRequest.params`.
 
 ### Features
