@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 import packageJson from '../package.json' with { type: 'json' };
 import {
@@ -11,6 +13,16 @@ import {
 } from '../src/index.js';
 
 const encoder = new TextEncoder();
+
+test('package entry points resolve to the compiled client and declarations', async () => {
+  const root = new URL('../../', import.meta.url);
+  for (const entry of [packageJson.main, packageJson.types,
+    packageJson.exports['.'].import, packageJson.exports['.'].types]) {
+    assert.ok(existsSync(fileURLToPath(new URL(entry, root))), `Missing package entry point: ${entry}`);
+  }
+  const sdk = await import(new URL(packageJson.exports['.'].import, root).href);
+  assert.equal(typeof sdk.AltertableLakehouseClient, 'function');
+});
 
 function makeNdjsonStream(lines: string[]): ReadableStream<Uint8Array> {
   return new ReadableStream({
