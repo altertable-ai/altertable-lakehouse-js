@@ -155,36 +155,36 @@ export class AltertableLakehouseClient {
       });
     }
 
-    const decoder = new TextDecoder();
-    const streamReader = reader;
-    const metadataLine = await this.readNextLine(streamReader, decoder, 'query');
-    const columnsLine = await this.readNextLine(streamReader, decoder, 'query');
-    const metadata = this.parseMetadataLine(metadataLine);
-    const columns = this.parseColumnsLine(columnsLine, 1);
+    const lines = this.readQueryLines(reader);
+    let metadata: QueryMetadata;
+    let columns: QueryColumn[];
+    try {
+      const metadataLine = await lines.next();
+      const columnsLine = await lines.next();
+      if (metadataLine.done || columnsLine.done) {
+        throw new ParseError('Unexpected end of NDJSON stream', 0, '', {
+          operation: 'query', method: 'POST', path: '/query',
+        });
+      }
+      metadata = this.parseMetadataLine(metadataLine.value);
+      columns = this.parseColumnsLine(columnsLine.value, 1);
+    } catch (error) {
+      await lines.return();
+      throw error;
+    }
 
     const self = this;
     async function* rows(): AsyncIterable<QueryRow> {
-      let buffer = '';
       let lineIndex = 2;
-      for (;;) {
-        const { done, value } = await streamReader.read();
-        if (done) {
-          if (buffer.trim().length > 0) {
-            yield self.parseRowLine(buffer, lineIndex, columns);
-          }
-          return;
-        }
-        buffer += decoder.decode(value, { stream: true });
-        let newlineIndex = buffer.indexOf('\n');
-        while (newlineIndex >= 0) {
-          const line = buffer.slice(0, newlineIndex).trim();
-          buffer = buffer.slice(newlineIndex + 1);
+      try {
+        for await (const line of lines) {
           if (line.length > 0) {
             yield self.parseRowLine(line, lineIndex, columns);
             lineIndex += 1;
           }
-          newlineIndex = buffer.indexOf('\n');
         }
+      } finally {
+        await lines.return();
       }
     }
 
@@ -393,41 +393,35 @@ export class AltertableLakehouseClient {
     return new ApiError(`API request failed with status ${response.status}`, shared);
   }
 
-  private async readNextLine(
+  private async *readQueryLines(
     reader: ReadableStreamDefaultReader<Uint8Array>,
-    decoder: TextDecoder,
-    operation: string,
-  ): Promise<string> {
+  ): AsyncGenerator<string, void, unknown> {
+    const decoder = new TextDecoder();
     let buffer = '';
-    for (;;) {
-      const newlineIndex = buffer.indexOf('\n');
-      if (newlineIndex >= 0) {
-        const line = buffer.slice(0, newlineIndex).trim();
-        const remainder = buffer.slice(newlineIndex + 1);
-        if (remainder.length > 0) {
-          const encoded = new TextEncoder().encode(remainder);
-          const rest = reader.read.bind(reader);
-          let first = true;
-          reader.read = async () => {
-            if (first) {
-              first = false;
-              return { done: false, value: encoded };
-            }
-            return rest();
-          };
+    let complete = false;
+    try {
+      for (;;) {
+        const { done, value } = await reader.read();
+        buffer += done ? decoder.decode() : decoder.decode(value, { stream: true });
+        let newlineIndex = buffer.indexOf('\n');
+        while (newlineIndex >= 0) {
+          const line = buffer.slice(0, newlineIndex).trim();
+          buffer = buffer.slice(newlineIndex + 1);
+          yield line;
+          newlineIndex = buffer.indexOf('\n');
         }
-        return line;
+        if (done) {
+          complete = true;
+          if (buffer.trim().length > 0) yield buffer.trim();
+          return;
+        }
       }
-
-      const { done, value } = await reader.read();
-      if (done) {
-        throw new ParseError('Unexpected end of NDJSON stream', 0, buffer, {
-          operation,
-          method: 'POST',
-          path: '/query',
-        });
+    } finally {
+      try {
+        if (!complete) await reader.cancel();
+      } finally {
+        reader.releaseLock();
       }
-      buffer += decoder.decode(value, { stream: true });
     }
   }
 

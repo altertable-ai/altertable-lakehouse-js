@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Preserve split UTF-8 characters across NDJSON metadata, schema and row chunks without re-decoding buffered text.
+
 - Fix package entry points to reference the compiled client and declarations.
 
 - Add named and positional query bind values through `QueryRequest.params`.
