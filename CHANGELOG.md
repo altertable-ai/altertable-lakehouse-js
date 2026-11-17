@@ -12,6 +12,13 @@
 
 - **api:** align query streaming, upload, upsert, and compute-size contracts with client specs v0.13.0
 
+## [0.4.2](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.4.1...lakehouse-v0.4.2) (2026-11-17)
+
+
+### Bug Fixes
+
+* **query:** preserve UTF-8 across streamed NDJSON boundaries ([#29](https://github.com/altertable-ai/altertable-lakehouse-js/issues/29)) ([5e18ce8](https://github.com/altertable-ai/altertable-lakehouse-js/commit/5e18ce8af67e5562e77718f063c080c4ddd4c70a))
+
 ## [0.4.1](https://github.com/altertable-ai/altertable-lakehouse-js/compare/lakehouse-v0.4.0...lakehouse-v0.4.1) (2026-10-12)
 
 
